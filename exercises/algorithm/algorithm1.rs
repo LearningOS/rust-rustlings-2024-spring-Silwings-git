@@ -2,7 +2,6 @@
 	single linked list merge
 	This problem requires you to merge two ordered singly linked lists into one ordered singly linked list
 */
-// I AM NOT DONE
 
 use std::fmt::{self, Display, Formatter};
 use std::ptr::NonNull;
@@ -29,13 +28,13 @@ struct LinkedList<T> {
     end: Option<NonNull<Node<T>>>,
 }
 
-impl<T> Default for LinkedList<T> {
+impl<T: Ord> Default for LinkedList<T> {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<T> LinkedList<T> {
+impl<T: Ord> LinkedList<T> {
     pub fn new() -> Self {
         Self {
             length: 0,
@@ -69,14 +68,32 @@ impl<T> LinkedList<T> {
             },
         }
     }
-	pub fn merge(list_a:LinkedList<T>,list_b:LinkedList<T>) -> Self
+	pub fn merge(mut list_a:LinkedList<T>,mut list_b:LinkedList<T>) -> Self
 	{
-		//TODO
-		Self {
-            length: 0,
-            start: None,
-            end: None,
+        let mut l: LinkedList<T> = LinkedList::new();
+        let mut vec: Vec<T> = vec![];
+        let length = if list_a.length > list_b.length {
+            list_a.length
+        } else {
+            list_b.length
+        } as i32;
+
+        for index in 0..length {
+            let a = list_a.get(index);
+            if let Some(a) = a {
+                vec.push(unsafe { std::mem::transmute_copy(a) });
+            }
+
+            let b = list_b.get(index);
+            if let Some(b) = b {
+                vec.push(unsafe { std::mem::transmute_copy(b) });
+            }
         }
+
+        vec.sort();
+        vec.into_iter().for_each(|e| l.add(e));
+
+        l
 	}
 }
 
