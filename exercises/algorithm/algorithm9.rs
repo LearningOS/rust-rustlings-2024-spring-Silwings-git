@@ -1,8 +1,7 @@
 /*
-	heap
-	This question requires you to implement a binary heap function
+    heap
+    This question requires you to implement a binary heap function
 */
-// I AM NOT DONE
 
 use std::cmp::Ord;
 use std::default::Default;
@@ -23,7 +22,7 @@ where
     pub fn new(comparator: fn(&T, &T) -> bool) -> Self {
         Self {
             count: 0,
-            items: vec![T::default()],
+            items: Vec::new(),
             comparator,
         }
     }
@@ -37,7 +36,29 @@ where
     }
 
     pub fn add(&mut self, value: T) {
-        //TODO
+        // 添加元素到数组末尾(也就是完全二叉树的末尾节点)
+        self.items.push(value);
+        self.count += 1;
+
+        let mut value_position = self.count;
+
+        loop {
+            // 计算当前节点的父节点,使用comparator进行比较,如果返回false,交换位置
+            let parent_index = self.parent_idx(value_position);
+
+            // 继续比较直到父节点不存在或comparator返回true
+            if parent_index > 0
+                && !(self.comparator)(
+                    &self.items[parent_index - 1],
+                    &self.items[value_position - 1],
+                )
+            {
+                self.items.swap(parent_index - 1, value_position - 1);
+                value_position = parent_index;
+            } else {
+                break;
+            }
+        }
     }
 
     fn parent_idx(&self, idx: usize) -> usize {
@@ -58,7 +79,7 @@ where
 
     fn smallest_child_idx(&self, idx: usize) -> usize {
         //TODO
-		0
+        0
     }
 }
 
@@ -84,8 +105,12 @@ where
     type Item = T;
 
     fn next(&mut self) -> Option<T> {
-        //TODO
-		None
+        if self.count == 0 {
+            None
+        } else {
+            self.count -= 1;
+            Some(self.items.remove(0))
+        }
     }
 }
 
@@ -116,6 +141,7 @@ impl MaxHeap {
 #[cfg(test)]
 mod tests {
     use super::*;
+
     #[test]
     fn test_empty_heap() {
         let mut heap = MaxHeap::new::<i32>();
